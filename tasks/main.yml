@@ -1,0 +1,16 @@
+---
+# tasks file for ansible-role-docker-registry
+
+- include_vars: "{{ ansible_os_family }}.yml"
+
+- set_fact:
+    docker_registry_instance_name: "{{ shelleg.prefix }}-{{ shelleg_hosts.infra[0].cname }}"
+    docker_registry_instance_ip: "{{ shelleg_hosts.infra[0].ip }}"
+
+- name: "Run the registry container"
+  include: docker-registry.yml
+  when: inventory_hostname == docker_registry_instance_name
+
+#- name: "Configure Docker Daemon to use the registry"
+#  include: docker-registry-client.yml
+#  when: docker_mode == true
