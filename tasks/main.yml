@@ -3,8 +3,11 @@
 
 - include_vars: "{{ ansible_os_family }}.yml"
 
+#- set_fact:
+    #docker_registry_instance_name: "{{ shelleg_hosts.registry[0].cname }}"
+    #docker_registry_instance_ip: "{{ shelleg_hosts.registry[0].ip }}"
 - set_fact:
-    docker_registry_instance_name: "{{ shelleg.prefix }}-{{ shelleg_hosts.infra[0].cname }}"
+    docker_registry_instance_name: "{{ shelleg_hosts.infra[0].cname }}"
     docker_registry_instance_ip: "{{ shelleg_hosts.infra[0].ip }}"
 
 - name: "Run the registry container"

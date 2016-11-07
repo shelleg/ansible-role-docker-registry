@@ -2,13 +2,26 @@
 - name: "Create {{ docker_registry_cache_dir }} to store docker image files"
   file: path="{{ docker_registry_cache_dir }}" state=directory
 
+- name: "Generate registry configuration"
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ docker_registry_config_file }}"
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+    - reg-config.yml
+
 - name: "Run docker-registry container"
   docker_container:
     image: "{{ docker_registry_image_name }}:{{ docker_registry_image_version }}"
     name: "{{ docker_registry_instance_name }}"
     ports:
       - "{{ docker_registry_port }}:5000"
-    volumes: "{{ docker_registry_cache_dir }}:{{ docker_registry_cache_dir }}"
+    volumes: 
+      - "{{ docker_registry_cache_dir }}:{{ docker_registry_cache_dir }}"
+      - "{{ docker_registry_config_file }}:/etc/docker/registry/config.yml:ro"
+      
     state: started
     restart: yes
     restart_policy: always
@@ -21,8 +34,8 @@
     group: root
     mode: 0755
   with_items:
-    - config.yml
-  when: docker_registry_enable_ui is true
+    - ui-config.yml
+  when: docker_registry_enable_ui
 
 - name: "Run docker-registry ui container"
   docker_container:
@@ -36,4 +49,4 @@
     state: started
     restart: yes
     restart_policy: always
-  when: docker_registry_enable_ui is true
+  when: docker_registry_enable_ui
